@@ -1,0 +1,119 @@
+<!-- <?xml version="1.0" encoding="ISO-8859-9"?> -->
+
+<project name="test" default="all" basedir=".">
+  <property name="bundle.name"      value="cache"/>
+  <property name="bundle.suf"       value="jar"/>
+  <property name="src.dir"          value="src"/>
+  <property name="gen.dir"          value="generated"/>
+  <property name="build.dir"        value="build"/>
+  <property name="res.dir"          value="resources"/>
+  <property name="orbd.port"        value="1500"/>
+  <property name="idl.name"         value="${bundle.name}.idl"/>
+
+		 	<!-- Create class path from lib and output directories. -->
+  <path id="classpath">
+	<pathelement location="${build.dir}" />
+ 	<fileset dir="${res.dir}">
+  		<include name="**/*.jar" />
+ 	</fileset>
+  </path>
+
+     <target name="init">
+ 	 <mkdir dir="${build.dir}"/>
+	 <mkdir dir="${gen.dir}"/>
+	 <mkdir dir="${res.dir}"/>
+     </target>
+
+		<uptodate property="idlj.notRequired">
+			<srcfiles dir="." includes="${idl.name}"/>
+ 			<mapper type="merge" to="${gen.dir}/cache/FileSystem.java"/>
+		</uptodate>
+
+  <target name="idlj" depends="init" description="Generate the Java files"  unless="idlj.notRequired">
+     <exec executable="idlj">
+       <arg value="-fallTie"/>
+       <arg value="-v"/>
+       <arg value="-td"/>
+       <arg value="${gen.dir}"/>
+       <arg value="${idl.name}"/>
+     </exec>
+  </target>
+
+     <target name="compile" depends="idlj" description="Compile the files of the bundle">
+       <javac srcdir="${gen.dir}" destdir="${build.dir}" listfiles="no" debug="on">
+       <classpath refid="classpath" />
+      	<include name="**/*.java" />
+       </javac>
+
+       <javac srcdir="${src.dir}" destdir="${build.dir}" listfiles="yes" debug="on">
+       <classpath refid="classpath" />
+      	<include name="**/*.java" />
+       </javac>
+     </target>
+
+
+    <target name="bundle" depends="compile, resources" description="Build the bundle">
+	<jar jarfile="${bundle.name}.${bundle.suf}" basedir="${build.dir}">
+	  <include name="**" />
+	</jar>
+    </target>
+
+   <target name="resources" depends="init">
+     <copy todir="${build.dir}">
+	<fileset dir="${res.dir}">
+	 <include name="**" />
+	</fileset>
+     </copy>
+   </target>
+
+     <target name="all" depends="bundle" description="Builds the whole project">
+     </target>
+
+     <target name="clean" description="Removes temporary compilation files">
+	 <delete includeemptydirs="true" failonerror="no">
+           <fileset dir="${gen.dir}"/>
+           <fileset dir="${build.dir}"/>
+	 </delete>
+     </target>
+
+     <target name="distclean" depends="clean" description="Removes previous build">
+       <delete failonerror="no">
+	 <fileset file="${bundle.name}*.${bundle.suf}"/>
+       </delete>
+     </target>
+
+
+    <target name="server" depends="bundle" description="Start the server">
+      <java classname="Server">
+        <arg value="-ORBInitialPort"/>
+        <arg value="${orbd.port}"/>
+        <classpath refid="classpath" />
+      </java>
+    </target>
+
+    <target name="client" depends="bundle" description="Start the client">
+      <java classname="Client">
+        <arg value="-ORBInitialPort"/>
+        <arg value="${orbd.port}"/>
+        <classpath refid="classpath" />
+      </java>
+    </target>
+
+    <target name="orbd" description="Start orbd">
+      <echo>Starting orbd...</echo>
+      <exec executable="orbd">
+        <arg value="-ORBInitialPort"/>
+        <arg value="${orbd.port}"/>
+      </exec>
+    </target>
+
+    <target name="info" description="Display informations to start the server and the client">
+      <echo>To start the server: 'java -cp ${bundle.name}.${bundle.suf} Server -ORBInitialPort ${orbd.port}'</echo>
+      <echo>To start the client: 'java -cp ${bundle.name}.${bundle.suf} Client -ORBInitialPort ${orbd.port}'</echo>
+    </target>
+
+</project>
+
+
+
+

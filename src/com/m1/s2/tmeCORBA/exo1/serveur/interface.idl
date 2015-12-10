@@ -1,0 +1,11 @@
+
+	exception DividedByZeroException { };
+	
+	interface Serveur{
+		
+		double add(in double x, in double y);
+		double sub(in double x, in double y);
+		double mult(in double x, in double y);
+		double div(in double x, in double y) raises (DividedByZeroException);
+	
+	};

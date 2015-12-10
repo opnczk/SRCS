@@ -1,0 +1,22 @@
+
+
+module com {
+module m1 {
+module s2 {
+module tmeCORBA {
+module cache {
+  typedef wstring  Donnee;
+  typedef wstring  Reference;
+
+  exception IOException {};
+  exception DoesNotExist { Reference r; };
+
+  interface FileSystem {
+		wstring read(in wstring Reference);
+		void write(in wstring Reference, in wstring Donnee); 
+  };
+};
+};
+};
+};
+};

@@ -1,0 +1,58 @@
+
+-> Polymorphisme : la capacité a choisir dynamiquement la méthode a executer en fonction du type réel de l'objet.
+
+
+En programmation répartie, il y a deux modes, le mode connecté, et le mode non connecté.
+-> Connecté  - Donc idées de session, et d'état. Lourd niveau serveur.
+
+-> UDP -> non connecté, donc il faut ajouter les ack "à la main", mais attention, il peut y avoir duplication sur le réseau !
+
+Différence entre connexion au niveau applicatif, et au niveau transport. Lors de l'apprentissage d'un nouveau language, il faut voir l'api "réseau fournie"
+
+
+Une socket est une API qui permet d'exploiter les services d'un protocole réseau.
+
+En Java
+-> TCP : ServerSocket et Socket
+-> UDP : DatagramSocket
+
+Une adresse n'est pas uniquement une adresse(IP) et un port, sinon il n'y aurai qu'une seule socket par couple.
+
+L'identification d'une socket :
+	-> en mode non-connecté {@ip, port}
+	-> en mode connecté {(@ip_src, port_src),(@ip_dest,port_dest)}
+	
+Ici voir code Sample1
+
+Attention aux flux bufferisés ! il faut les flush avant de fermer.
+
+On Comprends que ServerSocket est en mode non-connecté ! c'est pourquoi on peut créer une socket de type ServerSocket, et des socket simples en parralèles (voir identification des sockets)
+
+En utilisant UDP attention, vu qu'il n'y a pas d'ordre de réception, on ne peut pas utiliser des flux (avec UDP)!
+D'ou l'utilisation de DatagramSocket.
+
+(dans le tas il y a aussi ce qui est alloué dynamiquement avec le malloc. Les variables locales sont dans la pile)
+
+Pour faire communiquer deux processus, pour communiquer des données on utilise des IPC
+
+		 ______
+		| 	   |
+		| Pile |
+		|______|
+		|      |
+		|      |
+		|______|
+		|	   |
+		| Tas  |
+		|______|
+		|	   |
+		| Code |
+		|______|
+
+
+En Java tout les objets sont stockées dans le tas, la pile ne contient que des adresses d'objet.
+Les threads Java partagent le Tas. Cela ne pose pas de problème, et ne casse pas l'isolation, puisque en Java on ne peut forger des adresses (pas d'arithmétique des pointeurs).
+Conceptuellement on peut facilement parler, mais on reste isolé (threads).
+
+Le vrai interet des threads, est l'utilisation relativement simple de l'espace mémoire partagé, contrairement aux processus.
+

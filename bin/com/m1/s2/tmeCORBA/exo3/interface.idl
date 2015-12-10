@@ -1,0 +1,13 @@
+
+interface DistantHashTable {
+	
+	
+	typedef string<255> key;
+	typedef string<888> value;
+	
+	
+	boolean containsKey(in key k);
+	value get(in key k);
+	void put(in key k, in value val);
+
+};
